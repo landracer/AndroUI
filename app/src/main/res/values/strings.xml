@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--BLE Strings-->
+    <string name="ble_not_supported">BLE is not supported</string>
+    <string name="label_data">Data:</string>
+    <string name="label_device_address">Device address:</string>
+    <string name="label_state">State:</string>
+    <string name="no_data">No data</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="title_devices">Controller Scan</string>
+    <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
+
+    <string name="unknown_device">Unknown device</string>
+    <string name="unknown_characteristic">Unknown characteristic</string>
+    <string name="unknown_service">Unknown service</string>
+
+    <!-- Menu items -->
+    <string name="menu_connect">Connect</string>
+    <string name="menu_disconnect">Disconnect</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_stop">Stop</string>
+
+    <!-- sub title strings -->
+    <string name="sub_title_label">Label: </string>
+    <string name="sub_title_data">data</string>
+
+    <string name="hello">Hello World, ProjectSensorActivity!</string>
+    <string name="app_name">rAtTrax AndroUI</string>
+    <string name="test_text">0.00</string>
+    <string name="volts">Volts</string>
+    <string name="not_connected">You are not connected to a device</string>
+    <string name="title_connecting">connecting...</string>
+    <string name="title_connected_to">connected: </string>
+    <string name="title_not_connected">not connected</string>
+
+    <!-- DeviceListActivity -->
+    <string name="scanning">Scanning for devices...</string>
+    <string name="select_device">Bluetooth Classic Scan</string>
+    <string name="none_paired">No controllers have been paired</string>
+    <string name="none_found">No controllers found</string>
+    <string name="title_paired_devices">Paired controllers</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for Controllers</string>
+
+    <!-- Dashboard Strings -->
+    <string name="logo_string">Demo</string>
+    <string name="about_string">About</string>
+    <string name="home_string">Home</string>
+    <string name="search_string">Search</string>
+    <string name="connect_title">Connections</string>
+    <string name="settings_title">Settings</string>
+    <string name="tps_title">Custom</string>
+    <string name="boost_title">Boost</string>
+    <string name="oil_title">Oil Pressure</string>
+    <string name="wideband_title">Wideband O2</string>
+    <string name="temperature_title">Temperature</string>
+    <string name="custom_multi_1">Dual Gauge</string>
+    <string name="custom_multi_2">Multi-Gauge</string>
+    <string name="rpm_title">Tachometer</string>
+    <string name="reset_button">Reset Max</string>
+    <string name="max_button">Display Max</string>
+    <string name="speed_title">Speedometer</string>
+    <string name="volt_title">Voltage</string>
+    <string name="EGT1_title">EGT1</string>
+    <string name="EGT2_title">EGT2</string>
+    <string name="EGT3_title">EGT3</string>
+    <string name="EGT4_title">EGT4</string>
+    <string name="EGT5_title">EGT5</string>
+    <string name="EGT6_title">EGT6</string>
+    <string name="EGT7_title">EGT7</string>
+    <string name="EGT8_title">EGT8</string>
+    <string name="GPS_Speed_title">Speed</string>
+    <string name="RPM">RPM</string>
+
+
+
+    <!-- Whats New String -->
+    <string name="whats_new">rAtTrax OpenSource DataLogging Redefined. \n
+        Please visit: https://www.osrss.com/ \n\n
+            -Credits \n\n
+            -Martain Stefan - Parsed all mdv2 data \n\n
+            -Nick Sutton - Held the Flashlight \n\n
+        Dec-25-2019: \n\n
+
+        - Initial -AndroUI- a rAtTrax Android native release \n\n
+            -Mainly ported to suite the gauge needs of an older International Bus and interface with current rAtTrax/MDv2 hardware \n
+             (Multi-Gague screen was designed for **TABLET USE ONLY** 8inch screen with FHD set @752DPI)\n
+        -198mph challenge still applies email nick.sutton@patriotLSR.com for details. Time-slips in first email. PERIOD  \n\n
+
+        -1/25/2020 Initial Beta release. \n\n The gauges do NOT work MDv2 data from Arduino VIA Bluetooth is now working. Long Live AndroUI. \n\n
+
+        - MIT License \n\n
+
+    </string>
+
+    <string name="title_activity_blue_tooth_trace">BlueToothTrace</string>
+    <string name="action_settings">Settings</string>
+
+</resources>

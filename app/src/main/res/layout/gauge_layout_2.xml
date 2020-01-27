@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:atswidget="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="1dp"
+    android:orientation="vertical" >
+
+    <RelativeLayout style="@style/TitleBar" >
+
+        <ImageButton
+            android:id="@+id/homeButton"
+            style="@style/TitleBarAction"
+            android:layout_alignParentLeft="true"
+            android:contentDescription="@string/home_string"
+            android:onClick="goHome"
+            android:padding="5dip"
+            android:src="@drawable/title_home_default" />
+
+        <ImageView
+            style="@style/TitleBarSeparator"
+            android:layout_toRightOf="@+id/homeButton"
+            android:paddingLeft="2dp" />
+
+        <ImageButton
+            android:id="@+id/btnOne"
+            style="@style/TitleBarAction"
+            android:layout_toLeftOf="@+id/btnTwo"
+            android:contentDescription="@string/home_string"
+            android:onClick="buttonOneClick"
+            android:padding="5dip"
+            android:paddingRight="2dp"
+            android:src="@drawable/chart_play" />
+
+        <ImageButton
+            android:id="@+id/btnTwo"
+            style="@style/TitleBarAction"
+            android:layout_alignParentRight="true"
+            android:contentDescription="@string/home_string"
+            android:onClick="buttonTwoClick"
+            android:padding="5dip"
+            android:src="@drawable/chart_pause" />
+    </RelativeLayout>
+
+    <com.rAtTrax.AndroUI.GaugeBuilder
+        android:id="@+id/analogGauge"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="2dp"
+        android:layout_weight="1" />
+
+    <com.rAtTrax.AndroUI.GaugeBuilder
+        android:id="@+id/analogGauge2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="2dp"
+        android:layout_weight="1" />
+
+</LinearLayout>
