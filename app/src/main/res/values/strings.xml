@@ -87,10 +87,15 @@
 
         - Initial -AndroUI- a rAtTrax Android native release \n\n
             -Mainly ported to suite the gauge needs of an older International Bus and interface with current rAtTrax/MDv2 hardware \n
-             (Multi-Gague screen was designed for **TABLET USE ONLY** 8inch screen with FHD set @752DPI)\n
+             (Multi-Gague screen was designed for **TABLET USE ONLY** 8inch screen with FHD set @752DPI)\n NEED HARDWARE? \n
         -198mph challenge still applies email nick.sutton@patriotLSR.com for details. Time-slips in first email. PERIOD  \n\n
 
-        -1/25/2020 Initial Beta release. \n\n The gauges do NOT work MDv2 data from Arduino VIA Bluetooth is now working. Long Live AndroUI. \n\n
+        -1/25/2020 \n- The gauges do NOT work MDv2 data from Arduino VIA Bluetooth is now working. Long Live AndroUI. \n\n \n
+
+        -3/13/2020 \n- Friday the 13th, thing work now... Initial Beta Release. V.001. Tons of bugs and issues to work out. MAKE sure to
+          click on settings/general/classic bluetooth/(unchecking leave screen come back and re-check)  this will allow bluetooth to connect properly. (yes a bug or something)\n
+          Wideband gauge only works if you change settings to lambda. or only TextView numbers will show up.
+          more code work is needed to correctly have this working in both modes. RPM is slow to respond.\n\n
 
         - MIT License \n\n
 

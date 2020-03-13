@@ -1,15 +1,27 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/home/sysadmin/rAtTrax.keystore')
+            keyAlias = 'AndroUI'
+            keyPassword 'nigger11'
+            storePassword 'nigger11'
+        }
+    }
     compileSdkVersion 26
     //buildToolsVersion '26.0.0'
     defaultConfig {
         applicationId "com.rAtTrax.AndroUI"
         minSdkVersion 25
         targetSdkVersion 26
+        signingConfig signingConfigs.release
+        applicationIdSuffix = 'AUI'
+        versionCode = 1
+        versionName = 'Miami'
 
 
-            lintOptions {
+        lintOptions {
                 abortOnError false
             }
     }

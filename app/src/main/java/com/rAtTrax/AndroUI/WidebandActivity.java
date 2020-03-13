@@ -36,10 +36,14 @@ public class WidebandActivity extends Activity implements Runnable {
     TextView     txtViewDigital;
     TextView     txtViewVolts;
     TextView     txtViewVoltsText;
+    TextView     textViewGS1;
+    TextView     TextViewGPSspeed;
     float        currentSValue;
     float        voltSValue;
     boolean      paused;
     boolean      isBLE;
+    double      speed;
+
 
     //Prefs vars
     View    root;
@@ -82,6 +86,8 @@ public class WidebandActivity extends Activity implements Runnable {
         txtViewDigital  = (TextView) findViewById(R.id.txtViewDigital); 
         txtViewVolts    = (TextView) findViewById(R.id.txtViewVolts);
         txtViewVoltsText= (TextView) findViewById(R.id.txtViewVoltsText);
+        textViewGS1 = (TextView) findViewById(R.id.textViewGS1);
+        TextViewGPSspeed = (TextView) findViewById(R.id.TextViewGPSspeed);
         multiGauge      = new MultiGauges(context);
         multiGaugeVolts = new MultiGauges(context);
         btnOne          = (ImageButton) findViewById(R.id.btnOne);
@@ -92,6 +98,8 @@ public class WidebandActivity extends Activity implements Runnable {
         txtViewDigital.setTypeface(typeFaceDigital);
         txtViewVolts.setTypeface(typeFaceDigital);
         txtViewVoltsText.setTypeface(typeFaceDigital);
+        textViewGS1.setTypeface(typeFaceDigital);
+        TextViewGPSspeed.setTypeface(typeFaceDigital);
 
         //Setup gauge
         multiGauge.setAnalogGauge(analogGauge);
@@ -210,6 +218,12 @@ public class WidebandActivity extends Activity implements Runnable {
             analogGauge.setValue(multiGauge.getCurrentGaugeValue());
             txtViewDigital.setText(Float.toString(multiGauge.getCurrentGaugeValue()));
             txtViewVolts.setText(Float.toString(Math.abs(multiGaugeVolts.getCurrentGaugeValue())));
+
+            TinyDB tinyDB = new TinyDB(getApplicationContext());
+            //if (speed != null);
+            speed = 0.0;
+            speed = tinyDB.getDouble("GPSspeed", speed);
+            textViewGS1.setText(String.format("%.2f", speed));
         }
     }
 

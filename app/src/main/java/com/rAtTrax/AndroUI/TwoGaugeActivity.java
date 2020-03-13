@@ -28,10 +28,13 @@ public class TwoGaugeActivity extends Activity implements Runnable{
     MultiGauges  multiGauge2;
     TextView     txtViewDigital;
     TextView     txtViewDigital2;
+    TextView     textViewGS3;
+    TextView     textViewGSspeed1;
     ImageButton  btnOne;
     ImageButton  btnTwo;
     Typeface     typeFaceDigital;
     String       currentMsg;
+    double       speed;
 
 
     float   flt;
@@ -96,6 +99,8 @@ public class TwoGaugeActivity extends Activity implements Runnable{
         multiGauge2     = new MultiGauges(context);
         txtViewDigital  = (TextView) findViewById(R.id.txtViewDigital);
         txtViewDigital2 = (TextView) findViewById(R.id.txtViewDigital2);
+        textViewGS3 = (TextView) findViewById(R.id.textViewGS3);
+        textViewGSspeed1 = (TextView) findViewById(R.id.textViewGSspeed1);
         btnOne          = (ImageButton) findViewById(R.id.btnOne);
         btnTwo          = (ImageButton) findViewById(R.id.btnTwo);  
         typeFaceDigital = Typeface.createFromAsset(getAssets(), "fonts/LetsGoDigital.ttf");
@@ -103,6 +108,9 @@ public class TwoGaugeActivity extends Activity implements Runnable{
         //Set the font of the digital.
         txtViewDigital.setTypeface(typeFaceDigital);
         txtViewDigital2.setTypeface(typeFaceDigital);
+        textViewGS3.setTypeface(typeFaceDigital);
+        textViewGSspeed1.setTypeface(typeFaceDigital);
+
         txtViewDigital.setText("0.00");
         txtViewDigital2.setText("0.00");
 
@@ -269,6 +277,12 @@ public class TwoGaugeActivity extends Activity implements Runnable{
             txtViewDigital2.setText(Float.toString(Math.abs(multiGauge2.getCurrentGaugeValue())));
         }else{
             txtViewDigital2.setText(Float.toString(multiGauge2.getCurrentGaugeValue()));
+
+            TinyDB tinyDB = new TinyDB(getApplicationContext());
+            //if (speed != null);
+            speed = 0.0;
+            speed = tinyDB.getDouble("GPSspeed", speed);
+            textViewGS3.setText(String.format("%.2f", speed));
         }
 
     }

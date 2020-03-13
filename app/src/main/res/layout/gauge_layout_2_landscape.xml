@@ -25,7 +25,7 @@
             android:padding="5dip"
             android:paddingTop="2dp"
             android:src="@drawable/chart_play" />
-        
+
         <ImageButton
             android:id="@+id/btnDisplay"
             style="@style/TitleBarActionVertical"
@@ -55,17 +55,17 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="767dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal" >
+            android:layout_weight="0"
+            android:orientation="horizontal">
 
             <com.rAtTrax.AndroUI.GaugeBuilder
                 android:id="@+id/analogGauge"
@@ -83,18 +83,16 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
             android:layout_margin="0dp"
-            android:layout_weight="3"
-            android:orientation="horizontal" >
+            android:layout_weight="0"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/txtViewDigital"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="fill"
+                android:layout_width="505dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/test_text"
@@ -102,12 +100,42 @@
 
             <TextView
                 android:id="@+id/txtViewDigital2"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="fill"
+                android:layout_width="508dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/test_text"
+                android:textSize="45sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textViewGSspeed1"
+                android:layout_width="55dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center|right"
+                android:text="@string/GPS_Speed_title"
+                android:textSize="45sp" />
+
+            <Space
+                android:layout_width="50dp"
+                android:layout_height="37dp"
+                android:layout_weight="0" />
+
+            <TextView
+                android:id="@+id/textViewGS3"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center|left"
+                android:text="0.0"
                 android:textSize="45sp" />
         </LinearLayout>
     </LinearLayout>

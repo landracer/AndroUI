@@ -694,7 +694,7 @@ public class PSensor extends Activity implements LocationListener {
         }
 
         public void run() {
-            if (m_pSensor == null) {
+            if (m_pSensor != null) {
                 return;
             }
             if (m_pSensor.mSerialService.getState() == BluetoothSerialService.STATE_CONNECTED) {
