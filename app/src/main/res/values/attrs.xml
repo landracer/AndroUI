@@ -39,5 +39,9 @@
         <attr name="startHour" format="integer" />
         <attr name="endHour" format="integer" />
     </declare-styleable>
+    <declare-styleable name="OutlineTextView" >
+        <attr name="outlineColor" format="color" />
+        <attr name="outlineWidth" format="dimension" />
+    </declare-styleable>
 
 </resources>

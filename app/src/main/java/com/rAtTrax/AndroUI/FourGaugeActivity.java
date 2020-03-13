@@ -66,6 +66,8 @@ public class FourGaugeActivity extends Activity implements Runnable{
     TextView     txtViewDigital10;
     TextView     txtViewDigital11;
     TextView     txtViewDigital12;
+    TextView     textViewSpeed;
+    TextView     textViewGS2;
     TextView     txtViewVolts;
     TextView     txtViewVoltsText;
     float        batvolt;
@@ -89,7 +91,7 @@ public class FourGaugeActivity extends Activity implements Runnable{
     float   egt6;
     float   egt7;
     float   rpm;
-    float   speed;
+    double   speed;
 
 
     //Prefs vars
@@ -187,6 +189,10 @@ public class FourGaugeActivity extends Activity implements Runnable{
         txtViewDigital10 = (TextView) findViewById(R.id.txtViewDigital10);
         txtViewDigital11 = (TextView) findViewById(R.id.txtViewDigital11);
         txtViewDigital12 = (TextView) findViewById(R.id.txtViewDigital12);
+        textViewGS2 = (TextView) findViewById(R.id.textViewGS2);
+        textViewSpeed = (TextView) findViewById(R.id.textViewSpeed);
+        //txtViewDigital13 = (TextView) findViewById(R.id.txtViewDigital13);
+        //txtViewDigital14 = (TextView) findViewById(R.id.txtViewDigital14);
         txtViewVolts    = (TextView) findViewById(R.id.txtViewVolts);
         txtViewVoltsText= (TextView) findViewById(R.id.txtViewVoltsText);
         btnOne          = (ImageButton) findViewById(R.id.btnOne);
@@ -209,18 +215,23 @@ public class FourGaugeActivity extends Activity implements Runnable{
         txtViewDigital12.setTypeface(typeFaceDigital);
         txtViewVolts.setTypeface(typeFaceDigital);
         txtViewVoltsText.setTypeface(typeFaceDigital);
+        textViewGS2.setTypeface(typeFaceDigital);
+        textViewSpeed.setTypeface(typeFaceDigital);
+
         txtViewDigital.setText("0.00");
         txtViewDigital2.setText("0.00");
         txtViewDigital3.setText("0.00");
         txtViewDigital4.setText("0.00");
-        txtViewDigital5.setText("0.00");
-        txtViewDigital6.setText("0.00");
+        txtViewDigital5.setText("0000");
+        txtViewDigital6.setText("0000");
         txtViewDigital7.setText("0.00");
         txtViewDigital8.setText("0.00");
         txtViewDigital9.setText("0.00");
         txtViewDigital10.setText("0.00");
         txtViewDigital11.setText("0.00");
         txtViewDigital12.setText("0.00");
+       // txtViewDigital13.setText("0.00");
+       // txtViewDigital14.setText("0.00");
 
         //Setup gauge 1
         multiGauge1.setAnalogGauge(analogGauge1);
@@ -291,12 +302,12 @@ public class FourGaugeActivity extends Activity implements Runnable{
         //Setup gauge 13
         multiGauge13.setAnalogGauge(analogGauge13);
         multiGauge13.buildGauge(RPM_TOKEN);
-        txtViewDigital12.setText(Double.toString(multiGauge13.getSensorMaxValue()));
+        //txtViewDigital13.setText(Double.toString(multiGauge13.getSensorMaxValue()));
 
         //Setup gauge 14
         multiGauge14.setAnalogGauge(analogGauge14);
         multiGauge14.buildGauge(SPEED_TOKEN);
-        txtViewDigital12.setText(Double.toString(multiGauge14.getSensorMaxValue()));
+       // txtViewDigital14.setText(Double.toString(multiGauge14.getSensorMaxValue()));
 
         //Setup voltmeter
         multiGaugeVolts.buildGauge(VOLT_TOKEN);
@@ -330,7 +341,7 @@ public class FourGaugeActivity extends Activity implements Runnable{
             _bluetoothLeService.setHandler(mHandler);
         }
 
-        Thread thread = new Thread(FourGaugeActivity.this);
+        thread = new Thread(FourGaugeActivity.this);
         thread.start();
 
         if(!showAnalog){
@@ -346,8 +357,8 @@ public class FourGaugeActivity extends Activity implements Runnable{
             ((ViewManager)analogGauge10.getParent()).removeView(analogGauge10);
             ((ViewManager)analogGauge11.getParent()).removeView(analogGauge11);
             ((ViewManager)analogGauge12.getParent()).removeView(analogGauge12);
-            ((ViewManager)analogGauge13.getParent()).removeView(analogGauge13);
-            ((ViewManager)analogGauge14.getParent()).removeView(analogGauge14);//Remove analog gauge
+           // ((ViewManager)analogGauge13.getParent()).removeView(analogGauge13);
+           // ((ViewManager)analogGauge14.getParent()).removeView(analogGauge14);//Remove analog gauge
         }
         if(!showDigital){
             ((ViewManager)txtViewDigital.getParent()).removeView(txtViewDigital); //Remove digital gauge
@@ -363,6 +374,7 @@ public class FourGaugeActivity extends Activity implements Runnable{
             root = btnOne.getRootView(); //Get root layer view.
             ((ViewManager)txtViewVolts.getParent()).removeView(txtViewVolts);
             ((ViewManager)txtViewVoltsText.getParent()).removeView(txtViewVoltsText);
+
         }
 
     }
@@ -373,25 +385,27 @@ public class FourGaugeActivity extends Activity implements Runnable{
         public void handleMessage(Message msg) {
             if(!paused){
                 byte[] readBuf = (byte[]) msg.obj;
-                // construct a string from the valid bytes in the buffer
- //               String readMessage;
- //               try {
+//                // construct a string from the valid bytes in the buffer
+//                String readMessage;
+//                try {
 //                    readMessage = new String(readBuf, 0, msg.arg1);
 //                } catch (NullPointerException e) {
- //                   readMessage = "0";
- //               }
-                //Redraw the needle to the correct value.
- //               currentMsg = readMessage;
+//                    readMessage = "0";
+//                }
+//                //Redraw the needle to the correct value.
+//                currentMsg = readMessage;
+//
+//                //Log.d("Boost HERE", readMessage);
 
                 Message workerMsg = workerHandler.obtainMessage(msg.what, readBuf);
                 workerMsg.sendToTarget();
                 updateGauges();
             }
-
         }
     };
 
-    //Worker thread handling
+    //Worker thread handling wrangle data from MD or rAtTrax hardware. need other data from PSensor? Add/remove your needed data here... and everywhere else.
+
     public void run(){
         Looper.prepare();
         workerHandler = new Handler(){
@@ -418,7 +432,7 @@ public class FourGaugeActivity extends Activity implements Runnable{
                         multiGauge11.handleSensor(PSensor.sensorData.egt6);
                         multiGauge12.handleSensor(PSensor.sensorData.egt7);
                         multiGauge13.handleSensor(PSensor.sensorData.rpm);
-                        multiGauge14.handleSensor(PSensor.sensorData.speed);
+                       multiGauge14.handleSensor(PSensor.sensorData.speedMD);
                         break;
                     case PSensor.MESSAGE_DEVICE_NAME:
                         break;
@@ -464,8 +478,18 @@ public class FourGaugeActivity extends Activity implements Runnable{
             txtViewDigital10.setText(Float.toString(multiGauge10.getCurrentGaugeValue()));
             txtViewDigital11.setText(Float.toString(multiGauge11.getCurrentGaugeValue()));
             txtViewDigital12.setText(Float.toString(multiGauge12.getCurrentGaugeValue()));
+           // txtViewDigital13.setText(Float.toString(multiGauge13.getCurrentGaugeValue()));
+            //txtViewDigital14.setText(Float.toString(multiGauge14.getCurrentGaugeValue()));
 
             txtViewVolts.setText(Float.toString(Math.abs(multiGaugeVolts.getCurrentGaugeValue())));
+
+            //below sets MPH hut-hut hike from PSensor Activity threw TinyDB. Have a better way? Do it?
+           // TinyDB tinyDB = new TinyDB(getApplicationContext());
+           // if (speed != null)
+            TinyDB tinyDB = new TinyDB(getApplicationContext());
+            speed = 0.0;
+            speed = tinyDB.getDouble("GPSspeed", speed);
+            textViewGS2.setText(String.format("%.2f", speed));
         }
     }
 
@@ -473,8 +497,10 @@ public class FourGaugeActivity extends Activity implements Runnable{
 //        //String[] tokens=sValue.split(":,;"); //split the input into an array.
 //
 //        try {
-//            //Get current tokens for this gauge activity, cast as float.
+//        try {
 //            calBoost = Float.valueOf(tokens[BOOST_TOKEN].toString());
+//            calBoost = Float.valueOf(tokens[BOOST_TOKEN].toString());
+//            //Get current tokens for this gauge activity, cast as float.
 //            calLambda 	= Float.valueOf(tokens[WIDEBAND_TOKEN].toString());
 //            VDOTemp1 	= Float.valueOf(tokens[TEMP_TOKEN].toString());
 //            VDOPres1 	= Float.valueOf(tokens[OIL_TOKEN].toString());
@@ -546,8 +572,8 @@ public class FourGaugeActivity extends Activity implements Runnable{
     //chart/gauge display click handling
     public void buttonDisplayClick(View v){
         paused = true;
-        //workerHandler.getLooper().quit();
-        passObject();
+        workerHandler.getLooper().quit();
+        PassObject.setObject(mSerialService);
         Intent chartIntent = new Intent(this, QuadChartActivity.class);
         startActivity(chartIntent);
     }
@@ -615,7 +641,7 @@ public class FourGaugeActivity extends Activity implements Runnable{
 
 
             txtViewVolts.setText(Double.toString(multiGaugeVolts.getSensorMaxValue()));
-
+          //  textViewGS2.setText(String.format("%.2f", speed));
             btnTwo.setBackgroundResource(R.drawable.btn_bg_pressed);
         }else{
             paused = false;
@@ -629,7 +655,7 @@ public class FourGaugeActivity extends Activity implements Runnable{
 
     protected void onResume(){
         super.onResume();
-        Thread thread = new Thread(FourGaugeActivity.this);
+        thread = new Thread(FourGaugeActivity.this);
         thread.start();
         analogGauge1.invalidate();
         analogGauge2.invalidate();

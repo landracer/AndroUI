@@ -157,23 +157,25 @@ public class WidebandActivity extends Activity implements Runnable {
         public void handleMessage(Message msg) {
             if(!paused){
                 byte[] readBuf = (byte[]) msg.obj;
-                // construct a string from the valid bytes in the buffer
-                String readMessage;
-                try {
-                    readMessage = new String(readBuf, 0, msg.arg1);
-                } catch (NullPointerException e) {
-                    readMessage = "0";
-                }
-                //Redraw the needle to the correct value.
-                currentMsg = readMessage;
+//                // construct a string from the valid bytes in the buffer
+//                String readMessage;
+//                try {
+//                    readMessage = new String(readBuf, 0, msg.arg1);
+//                } catch (NullPointerException e) {
+//                    readMessage = "0";
+//                }
+//                //Redraw the needle to the correct value.
+//                currentMsg = readMessage;
+//
+//                //Log.d("Boost HERE", readMessage);
 
-                Message workerMsg = workerHandler.obtainMessage(1, currentMsg);
+                Message workerMsg = workerHandler.obtainMessage(msg.what, readBuf);
                 workerMsg.sendToTarget();
                 updateGauges();
             }
-
         }
     };
+
 
     public void run(){
         Looper.prepare();
@@ -186,7 +188,7 @@ public class WidebandActivity extends Activity implements Runnable {
                     case PSensor.MESSAGE_WRITE:
                         break;
                     case PSensor.MESSAGE_READ:
-                        PSensor.sensorData.parseInput(msg.obj.toString().getBytes());//parseInput((String)msg.obj);
+                        PSensor.sensorData.parseInput((byte[])msg.obj);//parseInput((byte[])msg.obj);
                         multiGauge.handleSensor(PSensor.sensorData.lambda);
                         multiGaugeVolts.handleSensor(PSensor.sensorData.batVolt);
                         break;
@@ -200,6 +202,7 @@ public class WidebandActivity extends Activity implements Runnable {
         	}
         };
         Looper.loop();
+
     }
 
     public void updateGauges(){

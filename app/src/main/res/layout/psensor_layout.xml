@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/db1_root"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:background="@drawable/tirestack"
+    android:backgroundTint="@android:color/transparent"
+    android:backgroundTintMode="add"
+    android:orientation="vertical">
 
-    <LinearLayout style="@style/TitleBar" >
+    <LinearLayout style="@style/TitleBar">
 
         <TextView
             android:id="@+id/title_text"
@@ -20,27 +25,77 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="6dip" >
+        android:padding="6dip">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/frameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="133dp"
+                    android:layout_height="163dp"
+                    android:text="0.0"
+                    android:textAlignment="inherit"
+                    android:textAllCaps="true"
+                    android:textSize="45sp"
+                    android:textStyle="bold"
+                    android:verticalScrollbarPosition="right"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+
+            <Button
+                android:id="@+id/GPSbutton"
+                style="@style/DashboardButton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/gnsico"
+                android:onClick="start"
+                android:text="@string/GPS"
+
+                android:textIsSelectable="false"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/connectBtn"
                 style="@style/DashboardButton"
-                android:drawableTop="@drawable/bluetooth_logo"
+                android:drawableTop="@drawable/blueico"
                 android:onClick="onClickActivity"
-                android:text="@string/connect_title" />
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="6"
+                android:text="@string/connect_title"
+                android:textColor="#FAF8F8"
+                android:textIsSelectable="false"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/settingsBtn"
                 style="@style/DashboardButton"
-                android:drawableTop="@drawable/settings_logo"
+                android:drawableTop="@drawable/settingssm"
                 android:onClick="onClickActivity"
-                android:text="@string/settings_title" />
+                android:text="@string/settings_title"
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="6"
+                android:textColor="#F8F5F5"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
         <View
@@ -53,51 +108,86 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/widebandBtn"
                 style="@style/DashboardButton"
-                android:drawableTop="@drawable/wideband_logo"
+                android:drawableTop="@drawable/gengaugesm"
                 android:onClick="onClickActivity"
-                android:text="@string/wideband_title" />
+                android:text="@string/wideband_title"
+                android:shadowColor="#000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="7"
+                android:textColor="#FAF9F9"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/boostBtn"
                 style="@style/DashboardButton"
-                android:drawableTop="@drawable/boost_logo"
+                android:drawableTop="@drawable/bigtcsm"
                 android:onClick="onClickActivity"
-                android:text="@string/boost_title" />
-            
+                android:text="@string/boost_title"
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="6"
+                android:textColor="#FAF9F9"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
             <Button
                 android:id="@+id/rpmBtn"
                 style="@style/DashboardButton"
                 android:drawableTop="@drawable/boost_logo"
+                android:enabled="true"
                 android:onClick="onClickActivity"
                 android:text="@string/rpm_title"
-                android:enabled="true" />
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="6"
+                android:textColor="#FFFFFF"
+                android:textSize="25sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/oilBtn"
                 style="@style/DashboardButton"
-                android:drawableTop="@drawable/oil_logo"
+                android:drawableTop="@drawable/oilpsm"
                 android:onClick="onClickActivity"
-                android:text="@string/oil_title" />
+                android:text="@string/oil_title"
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="6"
+                android:textColor="#FAF9F9"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/customBtn"
                 style="@style/DashboardButton"
-                android:drawableTop="@drawable/custom_logo"
+                android:drawableTop="@drawable/tempgaugesm"
                 android:onClick="onClickActivity"
-                android:text="@string/temperature_title" />
-            
+                android:text="@string/temperature_title"
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="6"
+                android:textColor="#FAF7F7"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
             <!--<Button
                 android:id="@+id/speedBtn"
                 style="@style/DashboardButton"
@@ -110,29 +200,43 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/multiBtn1"
                 style="@style/DashboardButton"
-                android:drawableTop="@drawable/custom_multi_logo"
+                android:drawableTop="@drawable/gaugecombosm"
                 android:onClick="onClickActivity"
-                android:text="User Pick Layout" />
+                android:text="User Pick Layout"
+                android:textColor="#FAF7F7"
+                android:shadowColor="#000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="7"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/multiBtn2"
                 style="@style/DashboardButton"
                 android:drawableTop="@drawable/four_gauges"
                 android:onClick="onClickActivity"
-                android:text="Gauge(s) Galore" />
-            
+                android:text="Gauge(s) Galore"
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="6"
+                android:textColor="#F8F5F5"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
             <!--<Button
                 android:id="@+id/voltBtn"
                 style="@style/DashboardButton"
                 android:drawableTop="@drawable/custom_logo"
                 android:onClick="onClickActivity"
                 android:text="@string/volt_title" />-->
-            
+
         </LinearLayout>
     </LinearLayout>
 

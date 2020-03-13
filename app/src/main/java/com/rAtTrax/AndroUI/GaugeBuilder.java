@@ -158,7 +158,7 @@ public final class GaugeBuilder extends View {
 
     public void setTotalNotches(int in){
         this.totalNotches = in;
-        setDegreesPerNotch();
+        setDegreesPerNotch(1);
     }
 
     public void setIncrementPerLargeNotch(int in){
@@ -193,7 +193,7 @@ public final class GaugeBuilder extends View {
         this.unitTitle = in;
     }
 
-    public void setDegreesPerNotch(){
+    public void setDegreesPerNotch(int in){
         degreesPerNotch = 360.0f/totalNotches;  
     }
 
@@ -725,5 +725,7 @@ public final class GaugeBuilder extends View {
         return targetValue;
     }
 
-}
+   // public void setDegreesPerNotch(int i) {
+    }
+
 

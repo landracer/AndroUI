@@ -22,6 +22,7 @@ import android.view.ViewManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.rAtTrax.AndroUI.TinyDB;
 
 public class BoostActivity extends Activity implements Runnable {
 
@@ -37,11 +38,15 @@ public class BoostActivity extends Activity implements Runnable {
     TextView     txtViewDigital;
     TextView     txtViewVolts;
     TextView     txtViewVoltsText;
+    TextView     textViewGS1;
+    TextView     TextViewGPSspeed;
+
 //    float        currentSValue;
 //    float        voltSValue;
     boolean      paused;
     Thread       thread;
     boolean      isBLE;
+    Double        speed;
 
     //Prefs vars
     View     root;
@@ -83,6 +88,9 @@ public class BoostActivity extends Activity implements Runnable {
         txtViewDigital  = (TextView) findViewById(R.id.txtViewDigital);
         txtViewVolts    = (TextView) findViewById(R.id.txtViewVolts);
         txtViewVoltsText= (TextView) findViewById(R.id.txtViewVoltsText);
+        textViewGS1 = (TextView) findViewById(R.id.textViewGS1);
+        TextViewGPSspeed = (TextView) findViewById(R.id.TextViewGPSspeed);
+       // TextViewSingleGPSspeedValue = (TextView) findViewById(R.id.TextViewSingleGPSspeedValue);
         multiGauge      = new MultiGauges(context);
         multiGaugeVolts = new MultiGauges(context);
         btnOne          = (ImageButton) findViewById(R.id.btnOne);
@@ -93,6 +101,8 @@ public class BoostActivity extends Activity implements Runnable {
         txtViewDigital.setTypeface(typeFaceDigital);
         txtViewVolts.setTypeface(typeFaceDigital);
         txtViewVoltsText.setTypeface(typeFaceDigital);
+        textViewGS1.setTypeface(typeFaceDigital);
+        TextViewGPSspeed.setTypeface(typeFaceDigital);
 
         //Setup gauge
         multiGauge.setAnalogGauge(analogGauge);
@@ -152,6 +162,7 @@ public class BoostActivity extends Activity implements Runnable {
             root = btnOne.getRootView(); //Get root layer view.
             ((ViewManager)txtViewVolts.getParent()).removeView(txtViewVolts);
             ((ViewManager)txtViewVoltsText.getParent()).removeView(txtViewVoltsText);
+
         }
 
     }
@@ -209,6 +220,7 @@ public class BoostActivity extends Activity implements Runnable {
                 }
             }
         };
+
         Looper.loop();
     }
 
@@ -218,6 +230,13 @@ public class BoostActivity extends Activity implements Runnable {
             txtViewDigital.setText(Float.toString(Math.abs(multiGauge.getCurrentGaugeValue())));
             txtViewVolts.setText(Float.toString(Math.abs(multiGaugeVolts.getCurrentGaugeValue())));
             //txtViewVolts.setText(Float.toString(currentSValue));
+
+            TinyDB tinyDB = new TinyDB(getApplicationContext());
+            if (speed != null);
+            speed = 0.0;
+            speed = tinyDB.getDouble("GPSspeed", speed);
+            textViewGS1.setText(String.format("%.2f", speed));
+
         }
     }
 
@@ -278,6 +297,7 @@ public class BoostActivity extends Activity implements Runnable {
             txtViewDigital.setText(Double.toString(Math.abs(multiGauge.getSensorMaxValue())));
             analogGauge.setValue((float)multiGauge.getSensorMaxValue());
             txtViewVolts.setText(Double.toString(multiGaugeVolts.getSensorMaxValue()));
+
             btnTwo.setBackgroundResource(R.drawable.btn_bg_pressed);
         }else{
             paused = false;

@@ -1,6 +1,8 @@
 package com.rAtTrax.AndroUI;
 
 import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.bluetooth.BluetoothAdapter;
@@ -13,25 +15,34 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.location.LocationManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Handler;
 import android.os.Message;
+import android.Manifest;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.rAtTrax.AndroUI.TinyDB;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PSensor extends Activity {
+
+public class PSensor extends Activity implements LocationListener {
     /**
      * Called when the activity is first created.
      */
 
+    LocationManager locationManager;//initialize variable, type LocationManager which is a class that provides access to system location services
     // Constants
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -68,9 +79,10 @@ public class PSensor extends Activity {
     public static final int UPDATE_SENSOR_TMR = 100;
     public static Sensor_BinaryData sensorData;
     //Global Variables.
-    TextView titleText;
+    TextView titleText, textView, textView2, textView3, textView4, textView5, textView6, textView7;//initialize my Views
     Typeface typeFaceBtn;
     Typeface typeFaceTitle;
+    Button GPSbtn;
     Button btnConnect;
     Button btnSettings;
     Button btnWideband;
@@ -82,6 +94,10 @@ public class PSensor extends Activity {
     Button btnRPM;
     Button btnSpeed;
     Button btnVolts;
+    int counts, radius, maxspeed;
+    double lat1, lon1, lat2, lon2, alt1, alt2, time1, distance, speed;//variables to save the coordinates, time, distance and speed
+    long start, finish, time;//variables that will help me count time in milliseconds
+    boolean above;
 
     //Bluetooth LE
     private Boolean isBLE;
@@ -90,10 +106,14 @@ public class PSensor extends Activity {
     private BluetoothLeService _bluetoothLEService = null;
     public BluetoothSerialService mSerialService = null;
     int intReadMsgPrevious = 0;
-
+    //TinyDB ttb = new TinyDB(this);
     public void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+
 
         //Set the screen to the main.xml layout.
         setContentView(R.layout.psensor_layout);
@@ -102,16 +122,32 @@ public class PSensor extends Activity {
         showWhatsNew();
 
         //Get the instances of the layout objects.
-        titleText = (TextView) findViewById(R.id.title_text);
-        btnConnect = (Button) findViewById(R.id.connectBtn);
+       // textView = findViewById(R.id.textView);
+      //  textView2 = findViewById(R.id.textView2);
+       // textView3 = findViewById(R.id.textView3);
+        //textView4 = findViewById(R.id.textView4);
+       // textView5 = findViewById(R.id.textView5);
+      //  textView4.setVisibility(View.INVISIBLE);
+      //  textView5.setVisibility(View.INVISIBLE);
+        textView3  = findViewById(R.id.textView3);
+        titleText   = (TextView) findViewById(R.id.title_text);
+        btnConnect  = (Button) findViewById(R.id.connectBtn);
         btnSettings = (Button) findViewById(R.id.settingsBtn);
+        GPSbtn      = (Button) findViewById(R.id.GPSbutton);
         btnWideband = (Button) findViewById(R.id.widebandBtn);
-        btnBoost = (Button) findViewById(R.id.boostBtn);
-        btnOil = (Button) findViewById(R.id.oilBtn);
-        btnCustom = (Button) findViewById(R.id.customBtn);
-        btnMulti1 = (Button) findViewById(R.id.multiBtn1);
-        btnMulti2 = (Button) findViewById(R.id.multiBtn2);
-        btnRPM = (Button) findViewById(R.id.rpmBtn);
+        btnBoost    = (Button) findViewById(R.id.boostBtn);
+        btnOil      = (Button) findViewById(R.id.oilBtn);
+        btnCustom   = (Button) findViewById(R.id.customBtn);
+        btnMulti1   = (Button) findViewById(R.id.multiBtn1);
+        btnMulti2   = (Button) findViewById(R.id.multiBtn2);
+        btnRPM      = (Button) findViewById(R.id.rpmBtn);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        distance =0;
+        start = 0;
+        counts = 0;
+        above = false;
+
         if (!ENABLE_RPM) {
             btnRPM.setVisibility(View.GONE);
         }
@@ -129,7 +165,9 @@ public class PSensor extends Activity {
         debug = false;
 
         //Set the font of the title text
-        titleText.setTypeface(typeFaceTitle);
+        GPSbtn.setTypeface(typeFaceTitle);
+        textView3.setTypeface(typeFaceBtn);
+        titleText.setTypeface(typeFaceBtn);
         btnConnect.setTypeface(typeFaceBtn);
         btnSettings.setTypeface(typeFaceBtn);
         btnWideband.setTypeface(typeFaceBtn);
@@ -143,12 +181,20 @@ public class PSensor extends Activity {
 //        btnVolts.setTypeface(typeFaceBtn);
 
         sensorData = new Sensor_BinaryData();
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)//if the permission for location access is given
+            GPSbtn.setText("Start");
+        else//if not
+            GPSbtn.setText("Activation");
+
         //Bluetooth LE check
         isBLE = false;
 //        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
 //            isBLE = false;
 //        } else { //Bluetooth is supprted, check if it's turned on in settings.
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+
+
         isBLE = !sp.getBoolean("isBluetoothClassic", false);
 //        }
 
@@ -195,9 +241,92 @@ public class PSensor extends Activity {
             }
         }
 
+
+
         GetSensorTimerTask tmrGetSensor = new GetSensorTimerTask(this);
         Timer t = new Timer();
         t.scheduleAtFixedRate(tmrGetSensor, 0, UPDATE_SENSOR_TMR);
+    }
+    @Override//GPS Location Listener settings
+    public void onLocationChanged(Location location) {//when the location has changed
+        if(counts==0) {//If the counter is 0 which means it is the first time that the location has changed
+            start = System.nanoTime();//a timer starts
+            lat1 = location.getLatitude();//the coordinates are saved
+            lon1 = location.getLongitude();
+            distance = 0;//I initialize the distance
+            //alt1 = location.getAltitude();//this would also save the altitude
+            counts +=1;
+        }
+        else if (counts == 1){//if the location has changed 5 times (I choose 5 times nad not 0 in order for the calculations to be less)
+            finish = System.nanoTime();//I finish the timer
+            lat2 = location.getLatitude();//the coordinates are saved
+            lon2 = location.getLongitude();
+            //alt2 = location.getAltitude();
+            time = finish - start;//I save the time in nanoseconds
+            time1 = (double)time / 1_000_000_000.0;//I convert time in seconds
+            distance = distance + measureDistance(lat1,lat2,lon1,lon2);//I calculate the distance between two points through my custom method measureDistance
+            speed = distance / time1; //calculate the speed in meters/second
+            speed = speed * 2.23694; //convert speed from m/s to mph change to 3.6 for km/h
+            //speed = (int) speed; //i get rid of the decimal numbers
+            textView3.setText(String.format("%.2f", speed));//the speed is shown
+
+            start = 0; //restart time and counter
+            finish = 0;
+            counts=0;
+          TinyDB tinyDB = new TinyDB(getApplicationContext());
+            tinyDB.putDouble("GPSspeed", speed);
+            System.out.println(String.format(("speed:%.2f"), speed));//debug -NO CODES LIKE THIS ARE NEEDED FOR RUNTIME. More follow...
+           // checkSpeed(lat2,lon2,speed);//method that checks if current speed is above the limit
+            //checkPOIs(lat2,lon2);//method that checks if we are within radius of a poi
+        }
+        else{
+            lat2 = location.getLatitude();
+            lon2 = location.getLongitude();
+            distance = distance + measureDistance(lat1,lat2,lon1,lon2);//i calculate the distance travelled
+            lat1 = lat2;
+            lon1 = lon2;
+            counts +=1;
+        }
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    public void start(View view) {//on start button click
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && GPSbtn.getText() == "Start") {//if the permission for location access is given
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);//we request location updates
+            GPSbtn.setText("Exit");
+        } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && GPSbtn.getText() == "Exit") {//if we want to exit the app
+            System.exit(0);
+        } else if (GPSbtn.getText() == "Activation") {//if we haven't given permission yet
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 6);//we request the permission
+            GPSbtn.setText("Start");
+        }
+    }
+
+
+    public double measureDistance(Double lat1, Double lat2, Double lon1, Double lon2) {//custom method that calculates distance between two points
+        //formula found on the web
+        final int R = 6371; // Radius of the earth
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+        return distance;
     }
 
 
@@ -735,7 +864,7 @@ public class PSensor extends Activity {
         public long vdo_temp2;
         public long vdo_temp3;
 
-        public float speed;
+        public float speedMD;
         public short gear;
         public short n75;
         public float n75_req_boost;
@@ -873,7 +1002,7 @@ public class PSensor extends Activity {
             int i = 0;
 
             time = Util.byte2long(rcvData[base + 0], rcvData[base + 1], rcvData[base + 2], rcvData[base + 3]);
-            System.out.println(String.format(("Time: %d"), time));
+            //System.out.println(String.format(("Time: %d"), time));
             base += 4;
 
             m_arpm[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
@@ -887,7 +1016,7 @@ public class PSensor extends Activity {
                 nTmp += m_arpm[i];
             }
             rpm = (int) (nTmp / BUFFSIZE);
-            System.out.println(String.format(("RPM: %d"), rpm));
+            //System.out.println(String.format(("RPM: %d"), rpm));
             base += 2;
 
             //absolute boost!
@@ -902,7 +1031,7 @@ public class PSensor extends Activity {
                 flTmp += m_aboost[i];
             }
             boost = limitDigits(flTmp);
-            System.out.println(String.format(("Boost: %.2f"), boost));
+            //System.out.println(String.format(("Boost: %.2f"), boost));
             base += 2;
 
             m_athrottle[nCurBuffID] = Util.byte2short(rcvData[base + 0]);
@@ -916,7 +1045,7 @@ public class PSensor extends Activity {
                 nTmp += m_athrottle[i];
             }
             throttle = (short) (nTmp / BUFFSIZE);
-            System.out.println(String.format(("throttle: %d"), throttle));
+            //System.out.println(String.format(("throttle: %d"), throttle));
             base += 1;
 
 
@@ -931,7 +1060,7 @@ public class PSensor extends Activity {
                 flTmp += m_alambda[i];
             }
             lambda = limitDigits(flTmp);
-            System.out.println(String.format(("Lambda: %.2f"), lambda));
+            //System.out.println(String.format(("Lambda: %.2f"), lambda));
             base += 2;
 
             m_almm[nCurBuffID] = fixed_b100_2double(Util.byte2int(rcvData[base + 0], rcvData[base + 1]));
@@ -945,7 +1074,7 @@ public class PSensor extends Activity {
                 flTmp += m_almm[i];
             }
             lmm = limitDigits(flTmp);
-            System.out.println(String.format(("LMM: %.2f"), lmm));
+            //System.out.println(String.format(("LMM: %.2f"), lmm));
             base += 2;
 
             m_acasetemp[nCurBuffID] = fixed_b100_2double(Util.byte2int(rcvData[base + 0], rcvData[base + 1]));
@@ -959,7 +1088,7 @@ public class PSensor extends Activity {
                 flTmp += m_acasetemp[i];
             }
             casetemp = limitDigits(flTmp);
-            System.out.println(String.format(("CaseTemp: %.2f"), casetemp));
+            //System.out.println(String.format(("CaseTemp: %.2f"), casetemp));
             base += 2;
 
             m_aegt0[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
@@ -973,7 +1102,7 @@ public class PSensor extends Activity {
                 nTmp += m_aegt0[i];
             }
             egt0 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("ATG0: %d"), egt0));
+            //System.out.println(String.format(("ATG0: %d"), egt0));
             base += 2;
             m_aegt1[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -986,7 +1115,7 @@ public class PSensor extends Activity {
                 nTmp += m_aegt1[i];
             }
             egt1 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("AGT1: %d"), egt1));
+            //System.out.println(String.format(("AGT1: %d"), egt1));
             base += 2;
             m_aegt2[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -999,7 +1128,7 @@ public class PSensor extends Activity {
                 nTmp += m_aegt2[i];
             }
             egt2 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("ATG2: %d"), egt2));
+            //System.out.println(String.format(("ATG2: %d"), egt2));
             base += 2;
             m_aegt3[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -1012,7 +1141,7 @@ public class PSensor extends Activity {
                 nTmp += m_aegt3[i];
             }
             egt3 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("EGT3: %d"), egt3));
+            //System.out.println(String.format(("EGT3: %d"), egt3));
             base += 2;
             m_aegt4[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -1025,7 +1154,7 @@ public class PSensor extends Activity {
                 nTmp += m_aegt4[i];
             }
             egt4 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("EGT4: %d"), egt4));
+            //System.out.println(String.format(("EGT4: %d"), egt4));
             base += 2;
             m_aegt5[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -1038,7 +1167,7 @@ public class PSensor extends Activity {
                 nTmp += m_aegt5[i];
             }
             egt5 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("EGT5: %d"), egt5));
+            //System.out.println(String.format(("EGT5: %d"), egt5));
             base += 2;
             m_aegt6[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -1051,7 +1180,7 @@ public class PSensor extends Activity {
                 nTmp += m_aegt6[i];
             }
             egt6 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("EGT6: %d"), egt6));
+            //System.out.println(String.format(("EGT6: %d"), egt6));
             base += 2;
             m_aegt7[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -1064,7 +1193,7 @@ public class PSensor extends Activity {
                 nTmp += m_aegt7[i];
             }
             egt7 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("EGT7: %d"), egt7));
+            //System.out.println(String.format(("EGT7: %d"), egt7));
             base += 2;
 
             m_abatVolt[nCurBuffID] = fixed_b100_2double(Util.byte2int(rcvData[base + 0], rcvData[base + 1]));
@@ -1078,7 +1207,7 @@ public class PSensor extends Activity {
                 flTmp += m_abatVolt[i];
             }
             batVolt = limitDigits(flTmp);
-            System.out.println(String.format(("Battery Volt: %.2f"), batVolt));
+            //System.out.println(String.format(("Battery Volt: %.2f"), batVolt));
             base += 2;
 
             //FIXME pressure / temp ints???
@@ -1093,7 +1222,7 @@ public class PSensor extends Activity {
                 nTmp += m_avdo_pres1[i];
             }
             vdo_pres1 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("VDOPres1: %d"), vdo_pres1));
+            //System.out.println(String.format(("VDOPres1: %d"), vdo_pres1));
             base += 2;
 
             m_avdo_pres2[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
@@ -1107,7 +1236,7 @@ public class PSensor extends Activity {
                 nTmp += m_avdo_pres2[i];
             }
             vdo_pres2 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("VDOPress2: %d"), vdo_pres2));
+            //System.out.println(String.format(("VDOPress2: %d"), vdo_pres2));
             base += 2;
             m_avdo_pres3[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -1120,7 +1249,7 @@ public class PSensor extends Activity {
                 nTmp += m_avdo_pres3[i];
             }
             vdo_pres3 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("VDOPress3: %d"), vdo_pres3));
+            //System.out.println(String.format(("VDOPress3: %d"), vdo_pres3));
             base += 2;
             m_avdo_temp1[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -1133,7 +1262,7 @@ public class PSensor extends Activity {
                 nTmp += m_avdo_temp1[i];
             }
             vdo_temp1 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("VDOTemp1: %d"), vdo_temp1));
+            //System.out.println(String.format(("VDOTemp1: %d"), vdo_temp1));
             base += 2;
             m_avdo_temp2[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
             if (bFirst) {
@@ -1146,7 +1275,7 @@ public class PSensor extends Activity {
                 nTmp += m_avdo_temp2[i];
             }
             vdo_temp2 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("VDOTemp2: %d"), vdo_temp2));
+            //System.out.println(String.format(("VDOTemp2: %d"), vdo_temp2));
             base += 2;
 
             m_avdo_temp3[nCurBuffID] = Util.byte2int(rcvData[base + 0], rcvData[base + 1]);
@@ -1160,7 +1289,7 @@ public class PSensor extends Activity {
                 nTmp += m_avdo_temp3[i];
             }
             vdo_temp3 = (nTmp / BUFFSIZE);
-            System.out.println(String.format(("VDOTemp3: %d"), vdo_temp3));
+            //System.out.println(String.format(("VDOTemp3: %d"), vdo_temp3));
             base += 2;
 
             //speed = rcvData[base+0] + (rcvData[base+1] << 8);
@@ -1174,8 +1303,8 @@ public class PSensor extends Activity {
             for (i = 0; i < BUFFSIZE; i++) {
                 flTmp += m_aspeed[i];
             }
-            speed = limitDigits(flTmp);
-            System.out.println(String.format(("Speed: %.2f"), speed));
+            speedMD = limitDigits(flTmp);
+            //System.out.println(String.format(("SpeedMD: %.2f"), speedMD));
             base += 2;
 
             m_agear[nCurBuffID] = Util.byte2short(rcvData[base + 0]);
@@ -1189,7 +1318,7 @@ public class PSensor extends Activity {
                 nTmp += m_agear[i];
             }
             gear = (short)(nTmp / BUFFSIZE);
-            System.out.println(String.format(("Gear: %d"), gear));
+            //System.out.println(String.format(("Gear: %d"), gear));
             base += 1;
             m_an75[nCurBuffID] = Util.byte2short(rcvData[base + 0]);
             if (bFirst) {
@@ -1202,7 +1331,7 @@ public class PSensor extends Activity {
                 nTmp += m_an75[i];
             }
             n75 = (short)(nTmp / BUFFSIZE);
-            System.out.println(String.format(("N75 Duty: %d"), n75));
+            //System.out.println(String.format(("N75 Duty: %d"), n75));
             base += 1;
             m_an75_req_boost[nCurBuffID] = fixed_b100_2double(Util.byte2int(rcvData[base + 0], rcvData[base + 1]));
             if (bFirst) {
@@ -1215,7 +1344,7 @@ public class PSensor extends Activity {
                 flTmp += m_an75_req_boost[i];
             }
             n75_req_boost = limitDigits(flTmp);
-            System.out.println(String.format(("N75 Req Bst: %.2f"), n75_req_boost));
+            //System.out.println(String.format(("N75 Req Bst: %.2f"), n75_req_boost));
             base += 2;
             m_an75_req_boost_pwm[nCurBuffID] = Util.byte2short(rcvData[base + 0]);
             if (bFirst) {
@@ -1228,7 +1357,7 @@ public class PSensor extends Activity {
                 nTmp += m_an75_req_boost_pwm[i];
             }
             n75_req_boost_pwm = (short)(nTmp / BUFFSIZE);
-            System.out.println(String.format(("N75 Boost PWM: %d"), n75_req_boost_pwm));
+            //System.out.println(String.format(("N75 Boost PWM: %d"), n75_req_boost_pwm));
             base++;
             m_aflags[nCurBuffID] = Util.byte2short(rcvData[base + 0]);
             if (bFirst) {
